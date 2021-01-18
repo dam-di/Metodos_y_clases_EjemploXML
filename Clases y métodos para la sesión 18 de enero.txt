@@ -1,10 +1,60 @@
-Nombre de la clase: Product.cs
+Este es el código mínimo necesario para realizar la sesión del día 18 de enero.
+Necesitarás crear 2 carpetas dentro del proyecto: XML y ProductsClass
+En cada carpeta añade el nombre de la clase y el código de la clase que se expone:
+Recuerda añadir a la carpeta XML, el archivo XMLFile1.xml que tienes en este repositorio.
 
-Libreria necesaria:
++ Carpeta: 
+XML
+
++ Nombre de la clase:
+XMLHandler.cs
+
++Librerias necesarias:
+using ComboXML.ProductsClass;
+using System;
+using System.Collections.ObjectModel;
+using System.Xml.Linq;
+
++ Código de la clase:
+class XMLHandler
+{
+    private static XDocument xml;
+    private static Product product;
+
+    private static void LoadXML(){xml = XDocument.Load("../../XML/XMLFile1.xml");}
+
+    public static ObservableCollection<Product> LoadProducts()
+    {
+        ObservableCollection<Product> productList = new ObservableCollection<Product>();
+        LoadXML();
+        var listaProductosXML = xml.Root.Elements("Categoria").Elements("Marca").Elements("Producto");
+        foreach(XElement productXML in listaProductosXML)
+        {
+            product = new Product();
+            product.productRef = productXML.Attribute("ProductRef").Value;
+            product.bottleType = productXML.Attribute("BottleType").Value;
+            product.description = productXML.Attribute("Description").Value;
+            product.brand = productXML.Parent.Attribute("Nombre").Value;
+            product.category = productXML.Parent.Parent.Attribute("IdCategoria").Value;
+            productList.Add(product);
+        }
+        return productList;
+    }
+}
+
+
+
+
++ Carpeta:
+ProductsClass
+
++ Nombre de la clase: 
+Product.cs
+
++ Libreria necesaria:
 using System;
 
-Clase:
-
++ Código de la clase:
 public class Product: ICloneable
     {
         public String productRef { set; get; }
@@ -16,5 +66,31 @@ public class Product: ICloneable
         public Product()
         {
         }
+    }
+    
 
+
++ Carpeta: 
+ProductsClass
+
++ Nombre de la clase: 
+ProductHandler.cs
+
++ Librerias necesarias:
+using System.Collections.ObjectModel;
+
++ Código de la clase:
+public class ProductHandler
+    {
+        public ObservableCollection<Product> productList { set; get; }
+
+        public ProductHandler()
+        {
+            this.productList = new ObservableCollection<Product>();
+            UpdateProductList();
+        }
+
+        public void UpdateProductList(){this.productList = XMLHandler.LoadProducts();}
+
+        public void AddProduct(Product product){productList.Add(product);}
     }
